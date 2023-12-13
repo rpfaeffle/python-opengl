@@ -1,5 +1,6 @@
 import pygame
 import sys
+from OpenGL.GL import *
 
 from core.input import Input
 
@@ -38,6 +39,9 @@ class Base(object):
         self.initialize()
 
         while self.is_running:
+            # Clear the screen
+            glClear(GL_COLOR_BUFFER_BIT)
+
             self.update()
             # Display image on screen
             pygame.display.flip()
