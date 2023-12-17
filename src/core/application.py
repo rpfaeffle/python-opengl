@@ -1,6 +1,5 @@
 from OpenGL.GL import *
 from OpenGL.GLUT import *
-from core.component import Component
 
 
 class Application(object):
@@ -13,7 +12,7 @@ class Application(object):
         self.screen_size = screen_size
 
         # Set important variables
-        self.is_running = True
+        self.target_fps = 60
 
         # Initialize the OpenGL window
         glutInit()
@@ -27,21 +26,28 @@ class Application(object):
         pass
 
     # implement by initializing the class
-    def render(self) -> Component:
+    def render(self, context):
+        pass
+
+    def context(self):
         pass
 
     def _run(self):
         # Clear the screen
         glClear(GL_COLOR_BUFFER_BIT)
-        root = self.render()
-        root.render(None)
+        self.render(self.context())
         glFlush()
+
+    def update(self, _):
+        glutPostRedisplay()  # Trigger a redraw
+        glutTimerFunc(int(1000 / self.target_fps), self.update, 0)  # Restart the timer
 
     def run(self):
         # Startup
         self.initialize()
-
         # Set the display function, this is the applications run function
         glutDisplayFunc(self._run)
+        # Set a timer to trigger a redraw of the screen
+        glutTimerFunc(int(1000 / self.target_fps), self.update, 0)
         # Start the main OpenGL loop
         glutMainLoop()

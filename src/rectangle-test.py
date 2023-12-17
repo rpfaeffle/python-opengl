@@ -32,4 +32,5 @@ class Rectangle(Component):
             glVertex2f(*vertex)
         glEnd()
 
+
 Test().run()
