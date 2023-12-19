@@ -1,7 +1,7 @@
 from core.application import Application
 from OpenGL.GL import *
-from datetime import datetime
 import random
+import math
 
 
 def get_random_direction():
@@ -13,28 +13,27 @@ class DVD(Application):
         super().__init__(screen_size)
         self.x_direction = 1
         self.y_direction = 1
-        self.start_time = None
         self.x = start_position[0]
         self.y = start_position[1]
 
     def initialize(self):
+        super().initialize()
         print("Initializing program...")
-        self.start_time = datetime.now()
-        self.item_size = 10
+        self.item_size = 30
 
     def render(self, context):
         width = self.screen_size[0]
         height = self.screen_size[1]
 
         # Check if the ball is at the edge of the screen and change direction
-        if self.x > width - (self.item_size + self.x_direction):
+        if self.x > width - (self.item_size / 2 + self.x_direction):
             self.x_direction = -1 * get_random_direction()
-        elif self.x < -1 * (width - (self.item_size + self.x_direction)):
+        elif self.x < -1 * (width - (self.item_size / 2 + self.x_direction)):
             self.x_direction = get_random_direction()
 
-        if self.y > height - (self.item_size + self.y_direction):
+        if self.y > height - (self.item_size / 2 + self.y_direction):
             self.y_direction = -1 * get_random_direction()
-        elif self.y < -1 * (height - (self.item_size + self.y_direction)):
+        elif self.y < -1 * (height - (self.item_size / 2 + self.y_direction)):
             self.y_direction = get_random_direction()
 
         # Move the ball
@@ -50,6 +49,8 @@ class DVD(Application):
         ]
 
         glBegin(GL_QUADS)
+        time = context['time']
+        glColor3f(abs(math.sin(time)), abs(math.cos(time)), abs(math.sin(time + 0.5)))
         for vertex in vertices:
             glVertex2f(*vertex)
         glEnd()

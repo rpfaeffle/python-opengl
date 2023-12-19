@@ -1,5 +1,7 @@
 from OpenGL.GL import *
 from OpenGL.GLUT import *
+from datetime import datetime
+from typing import Dict, Any
 
 
 class Application(object):
@@ -12,6 +14,7 @@ class Application(object):
         self.screen_size = screen_size
 
         # Set important variables
+        self.start_time = None
         self.target_fps = 60
 
         # Initialize the OpenGL window
@@ -21,21 +24,25 @@ class Application(object):
         # Set the title of the window
         glutCreateWindow(title)
 
-    # implement by initializing the class
     def initialize(self):
-        pass
+        self.start_time = datetime.now()
 
     # implement by initializing the class
     def render(self, context):
         pass
 
-    def context(self):
-        pass
+    def context(self) -> Dict[str, Any]:
+        return {}
 
     def _run(self):
+        context = {
+          "time": (datetime.now() - self.start_time).total_seconds(),
+        } | self.context()
+
         # Clear the screen
         glClear(GL_COLOR_BUFFER_BIT)
-        self.render(self.context())
+        # Render the scene
+        self.render(self.context() | context)
         glFlush()
 
     def update(self, _):
