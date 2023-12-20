@@ -4,6 +4,17 @@ from datetime import datetime
 from typing import Dict, Any
 
 
+class GlobalContext(object):
+    def __init__(self, screen_size):
+        self.screen_size = screen_size
+
+    def get_width(self):
+        return self.screen_size[0]
+
+    def get_height(self):
+        return self.screen_size[1]
+
+
 class Application(object):
     def __init__(self, screen_size=None, title=None):
         # Set default variables
@@ -16,6 +27,9 @@ class Application(object):
         # Set important variables
         self.start_time = None
         self.target_fps = 60
+
+        # Set base context
+        self.global_context = GlobalContext(screen_size)
 
         # Initialize the OpenGL window
         glutInit()
@@ -37,6 +51,7 @@ class Application(object):
     def _run(self):
         context = {
           "time": (datetime.now() - self.start_time).total_seconds(),
+          "global": self.global_context
         } | self.context()
 
         # Clear the screen
