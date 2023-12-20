@@ -37,6 +37,7 @@ class Application(object):
         self.start_time = datetime.now()
         self.previous_time = time.time()
         self.current_frame = 0
+        self.cx.input.start()
 
     # implement by initializing the class
     def render(self):
