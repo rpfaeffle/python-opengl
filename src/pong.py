@@ -1,5 +1,6 @@
 from core.application import Application
 from core.component import Render
+from core.context import WindowContext
 from components.div import Div
 
 
@@ -8,7 +9,7 @@ class Pong(Render):
         self.border_width = 15
 
     @staticmethod
-    def new(cx):
+    def new(cx: WindowContext):
         return Pong()
 
     def render(self, cx):

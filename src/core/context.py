@@ -1,20 +1,20 @@
 from core.input import Input
 
 
-class ViewContext(object):
-    def __init__(self):
-        self.bg_color = (1.0, 1.0, 1.0, 1.0)
-
-    def bg(self, color: tuple[float, float, float, float]):
-        self.bg_color = color
-        return self
-
-
 class WindowContext(object):
+    _instance = None
+
+    # Singleton
+    def __new__(cls):
+        if not cls._instance:
+            cls._instance = super().__new__(cls)
+        return cls._instance
+
     def __init__(self):
         self.width = 720
         self.height = 540
         self.title = "Main Application Window"
+        self.elapsed_time = 0
         self.input = Input()
 
     def set_width(self, width: int):

@@ -1,6 +1,6 @@
 from OpenGL.GL import *
 from core.component import Component
-from core.context import ViewContext
+from core.context import WindowContext
 from core.openGLUtils import OpenGLUtils
 
 
@@ -32,9 +32,9 @@ class Div(Component):
         self.y = y
         return self
 
-    def render(self, cx: ViewContext):
-        x, y = OpenGLUtils.convert_to_normalized_coordinates(self.x, self.y, 640, 480)
-        width, height = OpenGLUtils.convert_to_normalized_size(self.width, self.height, 640, 480)
+    def render(self, cx: WindowContext):
+        x, y = OpenGLUtils.convert_to_normalized_coordinates(self.x, self.y, cx.width, cx.height)
+        width, height = OpenGLUtils.convert_to_normalized_size(self.width, self.height, cx.width, cx.height)
 
         glPushMatrix()
         glTranslatef(x, y, 0)  # Position the rectangle
@@ -48,8 +48,7 @@ class Div(Component):
         glEnd()
         glPopMatrix()
 
-        for child in self.children:
-            child.render(cx)
+        return self.children
 
     def child(self, child):
         self.children.append(child)

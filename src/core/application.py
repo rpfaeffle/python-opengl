@@ -17,8 +17,11 @@ class Application(object):
         self.screen_size = screen_size
 
         # Set important variables
+        self.current_frame = None
+        self.previous_time = None
         self.start_time = None
         self.target_fps = 60
+        self.frame_rate = 0
 
         # Set base context
         self.cx = WindowContext().set_width(screen_size[0]).set_height(screen_size[1]).set_title(title)
@@ -42,23 +45,33 @@ class Application(object):
     # There is a type conflict between Render and Component
     # and due to the fact that this is an internal method
     # typing is not provided for this method
-    def _run(self, component):
+    def _run(self, components):
         # Clear the screen
         glClear(GL_COLOR_BUFFER_BIT)
+
         # Render the scene
-        while component is not None:
-            component = component.render(self.cx)
+        while len(components) > 0:
+            component = components.pop(0)
+            if component is not None:
+                # Loop through the components and render them
+                result = component.render(self.cx)
+                # If the component is a list, extend the list
+                # otherwise append the component
+                components.extend(result if isinstance(result, list) else [result])
         # Flush the buffer
         glFlush()
 
     def update(self, frame):
+        self.cx.elapsed_time = (datetime.now() - self.start_time).total_seconds()
+
+        # Calculate the frame rate
         self.current_frame += 1
 
         if frame % 60 == 0:
             current_time = time.time()
-            elapsed_time = datetime.now() - self.start_time
-            frame_rate = frame / elapsed_time.total_seconds()
-            print(f"FPS: {frame_rate:.2f}")
+            self.frame_rate = frame / self.cx.elapsed_time
+            # Log current frame rate
+            print(f"FPS: {self.frame_rate:.2f}")
             self.previous_time = current_time
 
         glutPostRedisplay()  # Trigger a redraw
@@ -70,7 +83,7 @@ class Application(object):
         # Get the base component
         base_component = callback(self.cx)
         # Set the display function, this is the applications run function
-        glutDisplayFunc(lambda: self._run(base_component))
+        glutDisplayFunc(lambda: self._run([base_component]))
         # Set a timer to trigger a redraw of the screen
         glutTimerFunc(int(1000 / self.target_fps), self.update, 0)
         # Start the main OpenGL loop

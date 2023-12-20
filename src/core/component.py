@@ -1,15 +1,15 @@
 from abc import ABC, abstractmethod
 from typing import Any
 
-from core.context import ViewContext, WindowContext
+from core.context import WindowContext
 
 
 class Component(ABC):
     """
     The core stateless component class that is used to render an element tree.
     """
-
-    def render(self, cx: ViewContext) -> Any:
+    @abstractmethod
+    def render(self, cx: WindowContext) -> Any:
         pass
 
 
