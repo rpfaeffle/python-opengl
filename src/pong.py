@@ -8,7 +8,6 @@ class Pong(Application):
     def __init__(self, screen_size=[858, 525]):
         super().__init__(screen_size, "Pong Game")
         self.border_width = 15
-        self.player = None
 
     def initialize(self):
         super().initialize()
@@ -17,6 +16,7 @@ class Pong(Application):
             Rectangle(0, self.screen_size[1] - self.border_width, self.screen_size[0], self.border_width,
                       self.global_context),
         ]
+        self.global_context.get_input().register(b'w', 0, lambda: print("We are moving up"))
 
     def render_border(self, context):
         for border in self.borders:

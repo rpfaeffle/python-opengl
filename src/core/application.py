@@ -1,5 +1,6 @@
 from OpenGL.GL import *
 from OpenGL.GLUT import *
+from core.input import Input
 from datetime import datetime
 from typing import Dict, Any
 
@@ -7,12 +8,16 @@ from typing import Dict, Any
 class GlobalContext(object):
     def __init__(self, screen_size):
         self.screen_size = screen_size
+        self.input = Input()
 
     def get_width(self):
         return self.screen_size[0]
 
     def get_height(self):
         return self.screen_size[1]
+
+    def get_input(self):
+        return self.input
 
 
 class Application(object):
@@ -71,5 +76,7 @@ class Application(object):
         glutDisplayFunc(self._run)
         # Set a timer to trigger a redraw of the screen
         glutTimerFunc(int(1000 / self.target_fps), self.update, 0)
+        # Start to register keyboard events
+        self.global_context.get_input().start()
         # Start the main OpenGL loop
         glutMainLoop()

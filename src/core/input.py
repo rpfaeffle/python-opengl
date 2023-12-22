@@ -1,12 +1,25 @@
-import pygame
+from OpenGL.GLUT import *
 
-class Input(object):
+
+class Input:
+    _instance = None
+
+    # Singleton class
+    def __new__(cls):
+        if not cls._instance:
+            cls._instance = super().__new__(cls)
+        return cls._instance
+
     def __init__(self):
-        # Determine whether the user has quit the application
-        self.has_quitted = False
+        self.callbacks = {}
 
-    def update(self):
-        # Iterate over all user input events
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                self.has_quitted = True
+    def register(self, key, modifiers, callback):
+        self.callbacks[(key, modifiers)] = callback
+
+    def handle_keyboard_event(self, key, x, y):
+        modifiers = glutGetModifiers()
+        if (key, modifiers) in self.callbacks:
+            self.callbacks[(key, modifiers)]()
+
+    def start(self):
+        glutKeyboardFunc(self.handle_keyboard_event)
