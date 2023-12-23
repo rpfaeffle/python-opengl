@@ -1,14 +1,28 @@
-class Component(object):
+from abc import ABC, abstractmethod
+from typing import Any
+
+from core.context import ViewContext, WindowContext
+
+
+class Component(ABC):
+    """
+    The core stateless component class that is used to render an element tree.
+    """
+
+    def render(self, cx: ViewContext) -> Any:
+        pass
+
+
+class Render(ABC):
     """
     Interface that is used to render the different components on screen.
     """
 
-    def __init__(self):
-        self.children: list[Component] = []
+    @staticmethod
+    @abstractmethod
+    def new(cx: WindowContext):
+        pass
 
-    def add_child(self, child):
-        self.children.append(child)
-
-    def render(self, context):
-        for child in self.children:
-            child.render(context)
+    @abstractmethod
+    def render(self, cx: WindowContext) -> Component:
+        pass

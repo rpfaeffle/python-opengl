@@ -1,23 +1,10 @@
 from OpenGL.GL import *
 from OpenGL.GLUT import *
-from core.input import Input
+from core.context import WindowContext
+from core.component import Render
 from datetime import datetime
-from typing import Dict, Any
-
-
-class GlobalContext(object):
-    def __init__(self, screen_size):
-        self.screen_size = screen_size
-        self.input = Input()
-
-    def get_width(self):
-        return self.screen_size[0]
-
-    def get_height(self):
-        return self.screen_size[1]
-
-    def get_input(self):
-        return self.input
+from typing import Callable
+import time
 
 
 class Application(object):
@@ -26,7 +13,7 @@ class Application(object):
         if screen_size is None:
             screen_size = [520, 520]
         if title is None:
-            title = b"Python OpenGL application"
+            title = format(b"Python OpenGL application")
         self.screen_size = screen_size
 
         # Set important variables
@@ -34,7 +21,7 @@ class Application(object):
         self.target_fps = 60
 
         # Set base context
-        self.global_context = GlobalContext(screen_size)
+        self.cx = WindowContext().set_width(screen_size[0]).set_height(screen_size[1]).set_title(title)
 
         # Initialize the OpenGL window
         glutInit()
@@ -45,38 +32,46 @@ class Application(object):
 
     def initialize(self):
         self.start_time = datetime.now()
+        self.previous_time = time.time()
+        self.current_frame = 0
 
     # implement by initializing the class
-    def render(self, context):
+    def render(self):
         pass
 
-    def context(self) -> Dict[str, Any]:
-        return {}
-
-    def _run(self):
-        context = {
-          "time": (datetime.now() - self.start_time).total_seconds(),
-          "global": self.global_context
-        } | self.context()
-
+    # There is a type conflict between Render and Component
+    # and due to the fact that this is an internal method
+    # typing is not provided for this method
+    def _run(self, component):
         # Clear the screen
         glClear(GL_COLOR_BUFFER_BIT)
         # Render the scene
-        self.render(self.context() | context)
+        while component is not None:
+            component = component.render(self.cx)
+        # Flush the buffer
         glFlush()
 
-    def update(self, _):
-        glutPostRedisplay()  # Trigger a redraw
-        glutTimerFunc(int(1000 / self.target_fps), self.update, 0)  # Restart the timer
+    def update(self, frame):
+        self.current_frame += 1
 
-    def run(self):
+        if frame % 60 == 0:
+            current_time = time.time()
+            elapsed_time = datetime.now() - self.start_time
+            frame_rate = frame / elapsed_time.total_seconds()
+            print(f"FPS: {frame_rate:.2f}")
+            self.previous_time = current_time
+
+        glutPostRedisplay()  # Trigger a redraw
+        glutTimerFunc(int(1000 / self.target_fps), self.update, self.current_frame)  # Restart the timer
+
+    def run(self, callback: Callable[[WindowContext], Render]):
         # Startup
         self.initialize()
+        # Get the base component
+        base_component = callback(self.cx)
         # Set the display function, this is the applications run function
-        glutDisplayFunc(self._run)
+        glutDisplayFunc(lambda: self._run(base_component))
         # Set a timer to trigger a redraw of the screen
         glutTimerFunc(int(1000 / self.target_fps), self.update, 0)
-        # Start to register keyboard events
-        self.global_context.get_input().start()
         # Start the main OpenGL loop
         glutMainLoop()
