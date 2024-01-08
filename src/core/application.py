@@ -8,16 +8,17 @@ import time
 
 
 class Application(object):
-    def __init__(self, screen_size=None, title=None):
+    def __init__(self, setup=None, screen_size=None, title=None):
         # Set default variables
         if screen_size is None:
             screen_size = [520, 520]
         if title is None:
             title = format(b"Python OpenGL application")
         self.screen_size = screen_size
+        self.setup = setup
 
         # Set important variables
-        self.current_frame = None
+        self.current_frame = 0
         self.previous_time = None
         self.start_time = None
         self.target_fps = 60
@@ -87,5 +88,9 @@ class Application(object):
         glutDisplayFunc(lambda: self._run([base_component]))
         # Set a timer to trigger a redraw of the screen
         glutTimerFunc(int(1000 / self.target_fps), self.update, 0)
+
+        if self.setup is not None:
+          self.setup(self.cx)
+
         # Start the main OpenGL loop
         glutMainLoop()
