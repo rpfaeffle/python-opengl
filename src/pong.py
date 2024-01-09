@@ -2,24 +2,20 @@ from core.application import Application
 from core.component import Component, Render
 from core.context import WindowContext
 from components.div import Div
+from enum import Enum
+
+class Direction(Enum):
+  Up = 0
+  Down = 1
 
 
 class Pong(Render):
     def __init__(self, cx: WindowContext):
         self.border_width = 15
-        cx.input.register(b'w', 0, lambda: Pong.on_move_up(cx))
-        cx.input.register(b's', 0, lambda: Pong.on_move_down(cx))
+        self.player = Player()
+        cx.input.register(b'w', 0, lambda: self.player.move(Direction.Up))
+        cx.input.register(b's', 0, lambda: self.player.move(Direction.Down))
         setattr(cx, 'player', {})
-
-    @staticmethod
-    def on_move_up(cx: WindowContext):
-        current_y = getattr(cx, 'player').get('y', 240 - 50)
-        getattr(cx, 'player')['y'] = current_y + 10
-
-    @staticmethod
-    def on_move_down(cx: WindowContext):
-        current_y = getattr(cx, 'player').get('y', 240 - 50)
-        getattr(cx, 'player')['y'] = current_y - 10
 
     @staticmethod
     def new(cx: WindowContext):
@@ -35,7 +31,7 @@ class Pong(Render):
                 .set_width(cx.width) \
                 .set_height(self.border_width) \
                 .set_y(cx.height - self.border_width)
-        ).child(Player())
+        ).child(self.player)
 
 
 class Player(Component):
@@ -43,10 +39,15 @@ class Player(Component):
         super().__init__()
         self.y = 240 - 50
 
+    def move(self, direction: Direction):
+        if direction == Direction.Up:
+            self.y += 10
+        elif direction == Direction.Down:
+            self.y -= 10
+
     def render(self, cx):
-        y_position = getattr(cx, 'player').get('y', 240 - 50)
-        return Div().set_width(10).set_height(100).set_y(y_position).set_x(cx.width - 10 - 15)
+        return Div().set_width(10).set_height(100).set_y(self.y).set_x(cx.width - 10 - 15)
 
 
 if __name__ == '__main__':
-    Application([640, 480], "Pong Game").run(lambda cx: Pong.new(cx))
+    Application(None, [640, 480], "Pong Game").run(lambda cx: Pong.new(cx))
