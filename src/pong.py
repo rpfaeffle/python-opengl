@@ -1,3 +1,4 @@
+import math
 import random
 from core.application import Application
 from core.component import Component, Render
@@ -20,7 +21,8 @@ class Direction(Enum):
 
 class Pong(Render):
     def __init__(self, cx: WindowContext):
-        self.player = Player(cx)
+        self.player = Player(cx, True)
+        self.computer = Player(cx, False)
         self.ball = Ball(cx)
         cx.input.register(b'w', 0, lambda: self.player.move(Direction.Up))
         cx.input.register(b's', 0, lambda: self.player.move(Direction.Down))
@@ -43,6 +45,8 @@ class Pong(Render):
             self.player
         ).child(
             self.ball
+        ).child(
+            self.computer
         )
 
 
@@ -83,10 +87,11 @@ class Ball(Component):
 
 
 class Player(Component):
-    def __init__(self, cx: WindowContext):
+    def __init__(self, cx: WindowContext, is_player: bool = True):
         super().__init__()
         self.maximum_height = cx.height - BORDER_WIDTH - PLAYER_DIMENSIONS[1] - 10
         self.y = (cx.height - PLAYER_DIMENSIONS[1]) // 2
+        self.x = cx.width - 10 * 2 - PLAYER_DIMENSIONS[0] // 2 if is_player else 10 + PLAYER_DIMENSIONS[0] // 2
 
     def move(self, direction: Direction):
         if direction == Direction.Up and self.y < self.maximum_height:
@@ -99,7 +104,7 @@ class Player(Component):
             PLAYER_DIMENSIONS[0]
         ).set_height(
             PLAYER_DIMENSIONS[1]
-        ).set_y(self.y).set_x(cx.width - 10 - 15)
+        ).set_y(self.y).set_x(self.x)
 
 
 if __name__ == '__main__':
