@@ -31,7 +31,15 @@ class Pong(Render):
     def new(cx: WindowContext):
         return Pong(cx)
 
+    def update(self):
+        ball_position_y = self.ball.y - PLAYER_DIMENSIONS[1] // 2
+
+        if self.ball.velocity[0] < 0:
+            self.computer.move(Direction.Up if ball_position_y > self.computer.y else Direction.Down)
+
     def render(self, cx):
+        self.update()
+
         return Div().child(
             Div() \
                 .set_width(cx.width) \
