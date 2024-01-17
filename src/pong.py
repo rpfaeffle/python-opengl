@@ -37,6 +37,22 @@ class Pong(Render):
         if self.ball.velocity[0] < 0:
             self.computer.move(Direction.Up if ball_position_y > self.computer.y else Direction.Down)
 
+        # Detect collision with computer
+        if self.computer.ball_did_hit(self.ball):
+            y_hit = self.computer.calculate_y_hit(self.ball)
+            if 0 < y_hit < 1:
+                self.ball.update_velocity(y_hit * math.pi)
+            else:
+                print("Point for player")
+
+        # Detect collision with player
+        if self.player.ball_did_hit(self.ball):
+            y_hit = self.player.calculate_y_hit(self.ball)
+            if 0 < y_hit < 1:
+                self.ball.update_velocity(-1 * y_hit * math.pi)
+            else:
+                print("Point for computer")
+
     def render(self, cx):
         self.update()
 
@@ -97,9 +113,18 @@ class Ball(Component):
 class Player(Component):
     def __init__(self, cx: WindowContext, is_player: bool = True):
         super().__init__()
+        self.is_player = is_player
         self.maximum_height = cx.height - BORDER_WIDTH - PLAYER_DIMENSIONS[1] - 10
         self.y = (cx.height - PLAYER_DIMENSIONS[1]) // 2
         self.x = cx.width - 10 * 2 - PLAYER_DIMENSIONS[0] // 2 if is_player else 10 + PLAYER_DIMENSIONS[0] // 2
+
+    def calculate_y_hit(self, ball: Ball):
+        return (ball.y - self.y) / (PLAYER_DIMENSIONS[1])
+
+    def ball_did_hit(self, ball: Ball):
+        if self.is_player:
+            return ball.x + BALL_DIMENSIONS[0] // 2 >= self.x - PLAYER_DIMENSIONS[0] // 2
+        return ball.x - BALL_DIMENSIONS[0] // 2 <= self.x + PLAYER_DIMENSIONS[0] // 2
 
     def move(self, direction: Direction):
         if direction == Direction.Up and self.y < self.maximum_height:
