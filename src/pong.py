@@ -24,6 +24,10 @@ class Pong(Render):
         self.player = Player(cx, True)
         self.computer = Player(cx, False)
         self.ball = Ball(cx)
+        self.borders = [
+            Div().set_width(cx.width).set_height(BORDER_WIDTH),
+            Div().set_width(cx.width).set_height(BORDER_WIDTH).set_y(cx.height - BORDER_WIDTH)
+        ]
         cx.input.register(b'w', 0, lambda: self.player.move(Direction.Up))
         cx.input.register(b's', 0, lambda: self.player.move(Direction.Down))
 
@@ -55,23 +59,7 @@ class Pong(Render):
 
     def render(self, cx):
         self.update()
-
-        return Div().child(
-            Div() \
-                .set_width(cx.width) \
-                .set_height(BORDER_WIDTH)
-        ).child(
-            Div() \
-                .set_width(cx.width) \
-                .set_height(BORDER_WIDTH) \
-                .set_y(cx.height - BORDER_WIDTH)
-        ).child(
-            self.player
-        ).child(
-            self.ball
-        ).child(
-            self.computer
-        )
+        return [self.player, self.computer, self.ball] + self.borders
 
 
 class Ball(Component):
