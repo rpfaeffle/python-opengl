@@ -16,12 +16,30 @@ class TextRenderer:
         for i in range(128):
           self.face.load_char(chr(i), freetype.FT_LOAD_RENDER | freetype.FT_LOAD_FORCE_AUTOHINT)
           bitmap = self.face.glyph.bitmap
+
+          # Generate a texture for the character
+          texture = glGenTextures(1)
+          glBindTexture(GL_TEXTURE_2D, texture)
+          glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST)
+          glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST)
+
+          glTexImage2D(GL_TEXTURE_2D, 0, GL_ALPHA, bitmap.width, bitmap.rows, 0, GL_ALPHA, GL_UNSIGNED_BYTE, bitmap.buffer)
+
+          # Create a display list for the character
           glNewList(self.list_base+i, GL_COMPILE)
-          glBitmap(bitmap.width, bitmap.rows, 0, 0, self.face.glyph.advance.x >> 6, 0, bitmap.buffer)
+          glBindTexture(GL_TEXTURE_2D, texture)
+          glBegin(GL_QUADS)
+          glTexCoord2f(0, 1); glVertex2f(0, 0)
+          glTexCoord2f(1, 1); glVertex2f(1, 0)
+          glTexCoord2f(1, 0); glVertex2f(1, 1)
+          glTexCoord2f(0, 0); glVertex2f(0, 1)
+          glEnd()
+          glBindTexture(GL_TEXTURE_2D, 0)
           glEndList()
-          error = glGetError()
-          if error != GL_NO_ERROR:
-              print("Error", error)
+
+          # Unbind the texture
+          glBindTexture(GL_TEXTURE_2D, 0)
+
 
     def render_text(self, text, x, y):
         glRasterPos2f(x, y)
