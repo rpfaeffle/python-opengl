@@ -25,14 +25,16 @@ class TextRenderer:
 
           glTexImage2D(GL_TEXTURE_2D, 0, GL_ALPHA, bitmap.width, bitmap.rows, 0, GL_ALPHA, GL_UNSIGNED_BYTE, bitmap.buffer)
 
+          width, height = bitmap.width / 640, bitmap.rows / 480
+
           # Create a display list for the character
           glNewList(self.list_base+i, GL_COMPILE)
           glBindTexture(GL_TEXTURE_2D, texture)
           glBegin(GL_QUADS)
           glTexCoord2f(0, 1); glVertex2f(0, 0)
-          glTexCoord2f(1, 1); glVertex2f(1, 0)
-          glTexCoord2f(1, 0); glVertex2f(1, 1)
-          glTexCoord2f(0, 0); glVertex2f(0, 1)
+          glTexCoord2f(1, 1); glVertex2f(width, 0)
+          glTexCoord2f(1, 0); glVertex2f(width, height)
+          glTexCoord2f(0, 0); glVertex2f(0, height)
           glEnd()
           glBindTexture(GL_TEXTURE_2D, 0)
           glEndList()
@@ -42,9 +44,14 @@ class TextRenderer:
 
 
     def render_text(self, text, x, y):
-        glRasterPos2f(x, y)
-        glListBase(self.list_base)
-        glCallLists([ord(c) for c in text])
+      glPushMatrix()
+      glTranslatef(x, y, 0)
+      glListBase(self.list_base)
+      for c in text:
+        if 32 <= ord(c) < 127:
+          glCallList(self.list_base + ord(c))
+          glTranslatef(.03, 0, 0)
+      glPopMatrix()
 
 class Text(Render):
   def __init__(self) -> None:
