@@ -14,6 +14,7 @@ class TextRenderer:
         self.load_chars()
 
     def load_chars(self):
+        glPixelStorei(GL_UNPACK_ALIGNMENT, 1)
         for i in range(128):
             self.face.load_char(chr(i), freetype.FT_LOAD_RENDER | freetype.FT_LOAD_FORCE_AUTOHINT)
             bitmap = self.face.glyph.bitmap
@@ -57,7 +58,6 @@ class TextRenderer:
         glColor3f(1.0, 1.0, 1.0)
         glPushMatrix()
         glTranslatef(x, y, 0)
-        glListBase(self.list_base)
         for c in text:
           if 32 <= ord(c) < 127:
             glCallList(self.list_base + ord(c))
@@ -67,7 +67,7 @@ class TextRenderer:
 class Text(Render):
   def __init__(self) -> None:
     super().__init__()
-    self.text = TextRenderer("./src/SpaceMono-Regular.ttf", 16)
+    self.text = TextRenderer("./src/Inconsolata_Condensed-Regular.ttf", 16)
 
   def render(self, cx) -> None:
     glEnable(GL_TEXTURE_2D)
@@ -75,6 +75,7 @@ class Text(Render):
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
     self.text.render_text(f"It works", 0, 0)
     self.text.render_text(f"Hello World!", -1, -.5)
+    self.text.render_text(f"{cx.frame_rate:.2f} FPS", 0, .5)
 
 
   @staticmethod
