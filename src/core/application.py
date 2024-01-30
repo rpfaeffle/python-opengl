@@ -23,6 +23,7 @@ class Application(object):
         self.start_time = None
         self.target_fps = 60
         self.frame_rate = 0
+        self.should_render = False
 
         # Set base context
         self.cx = WindowContext().set_width(screen_size[0]).set_height(screen_size[1]).set_title(title)
@@ -48,6 +49,9 @@ class Application(object):
     # and due to the fact that this is an internal method
     # typing is not provided for this method
     def _run(self, components):
+        if not self.should_render:
+            return
+
         # Clear the screen
         glClear(GL_COLOR_BUFFER_BIT)
 
@@ -63,6 +67,8 @@ class Application(object):
         # Flush the buffer
         glFlush()
 
+        self.should_render = False
+
     def update(self, frame):
         self.cx.elapsed_time = (datetime.now() - self.start_time).total_seconds()
 
@@ -74,8 +80,10 @@ class Application(object):
             self.frame_rate = frame / self.cx.elapsed_time
             # Log current frame rate
             print(f"FPS: {self.frame_rate:.2f}")
+            self.cx.frame_rate = self.frame_rate
             self.previous_time = current_time
 
+        self.should_render = True
         glutPostRedisplay()  # Trigger a redraw
         glutTimerFunc(int(1000 / self.target_fps), self.update, self.current_frame)  # Restart the timer
 

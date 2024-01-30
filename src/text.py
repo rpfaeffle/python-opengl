@@ -9,8 +9,9 @@ import freetype
 class TextRenderer:
     def __init__(self, font_name, size):
         self.face = freetype.Face(font_name)
-        self.face.set_char_size(size*64 * 4)
+        self.face.set_char_size(size*64)
         self.list_base = glGenLists(128)
+        self.width = 0
         self.load_chars()
 
     def load_chars(self):
@@ -18,8 +19,7 @@ class TextRenderer:
         for i in range(128):
             self.face.load_char(chr(i), freetype.FT_LOAD_RENDER | freetype.FT_LOAD_FORCE_AUTOHINT)
             bitmap = self.face.glyph.bitmap
-
-            print(self.face.glyph.metrics.width, self.face.glyph.metrics.height)
+            self.width = max(self.width, (bitmap.width * 1.25) / 640)
 
             # Generate a texture for the character
             texture = glGenTextures(1)
@@ -40,7 +40,7 @@ class TextRenderer:
             tex_coord_y = bitmap.rows / 480
 
             # Create a display list for the character
-            glNewList(self.list_base+i, GL_COMPILE)
+            glNewList(self.list_base + i, GL_COMPILE)
             glBindTexture(GL_TEXTURE_2D, texture)
             glBegin(GL_QUADS)
             glTexCoord2f(0, 1); glVertex2f(bearing_x, bearing_y)
@@ -61,13 +61,13 @@ class TextRenderer:
         for c in text:
           if 32 <= ord(c) < 127:
             glCallList(self.list_base + ord(c))
-            glTranslatef(.06, 0, 0)
+            glTranslatef(self.width, 0, 0)
         glPopMatrix()
 
 class Text(Render):
   def __init__(self) -> None:
     super().__init__()
-    self.text = TextRenderer("./src/Inconsolata_Condensed-Regular.ttf", 16)
+    self.text = TextRenderer("./src/SpaceMono-Regular.ttf", 16)
 
   def render(self, cx) -> None:
     glEnable(GL_TEXTURE_2D)
