@@ -16,6 +16,7 @@ class WindowContext(object):
         self.title = "Main Application Window"
         self.elapsed_time = 0
         self.input = Input()
+        self.font = None
 
     def set_width(self, width: int):
         self.width = width

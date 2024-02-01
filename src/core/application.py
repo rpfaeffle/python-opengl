@@ -6,6 +6,8 @@ from datetime import datetime
 from typing import Callable
 import time
 
+from core.font import Font
+
 
 class Application(object):
     def __init__(self, setup=None, screen_size=None, title=None):
@@ -34,6 +36,12 @@ class Application(object):
         glutInitWindowSize(screen_size[0], screen_size[1])
         # Set the title of the window
         glutCreateWindow(title)
+
+        glEnable(GL_TEXTURE_2D)
+        glEnable(GL_BLEND)
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
+
+        self.cx.font = Font("assets/fonts/SpaceMono-Regular.ttf", 24, self.cx)
 
     def initialize(self):
         self.start_time = datetime.now()
