@@ -9,7 +9,7 @@ import freetype
 class TextRenderer:
     def __init__(self, font_name, size):
         self.face = freetype.Face(font_name)
-        self.face.set_char_size(size*64)
+        self.face.set_char_size(size*64*4)
         self.list_base = glGenLists(128)
         self.width = 0
         self.load_chars()
@@ -67,7 +67,7 @@ class TextRenderer:
 class Text(Render):
   def __init__(self) -> None:
     super().__init__()
-    self.text = TextRenderer("./src/SpaceMono-Regular.ttf", 16)
+    self.text = TextRenderer("assets/fonts/SpaceMono-Regular.ttf", 16)
 
   def render(self, cx) -> None:
     glEnable(GL_TEXTURE_2D)
