@@ -1,4 +1,4 @@
-from OpenGL.GL import *
+import OpenGL.GL as gl
 from core.component import Component
 from core.context import WindowContext
 from core.openGLUtils import OpenGLUtils
@@ -36,17 +36,17 @@ class Div(Component):
         x, y = OpenGLUtils.convert_to_normalized_coordinates(self.x, self.y, cx.width, cx.height)
         width, height = OpenGLUtils.convert_to_normalized_size(self.width, self.height, cx.width, cx.height)
 
-        glPushMatrix()
-        glTranslatef(x, y, 0)  # Position the rectangle
+        gl.glPushMatrix()
+        gl.glTranslatef(x, y, 0)  # Position the rectangle
         color = (1.0, 1.0, 1.0, 0.5)
-        glColor4f(color[0], color[1], color[2], color[3])  # Set the rectangle color
-        glBegin(GL_QUADS)
-        glVertex2f(0, 0)
-        glVertex2f(0, height)
-        glVertex2f(width, height)
-        glVertex2f(width, 0)
-        glEnd()
-        glPopMatrix()
+        gl.glColor4f(color[0], color[1], color[2], color[3])  # Set the rectangle color
+        gl.glBegin(gl.GL_QUADS)
+        gl.glVertex2f(0, 0)
+        gl.glVertex2f(0, height)
+        gl.glVertex2f(width, height)
+        gl.glVertex2f(width, 0)
+        gl.glEnd()
+        gl.glPopMatrix()
 
         return self.children
 

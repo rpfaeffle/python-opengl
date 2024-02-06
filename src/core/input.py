@@ -1,4 +1,4 @@
-from OpenGL.GLUT import *
+import OpenGL.GLUT as glut
 
 
 class Input:
@@ -17,9 +17,9 @@ class Input:
         self.callbacks[(key, modifiers)] = callback
 
     def handle_keyboard_event(self, key, x, y):
-        modifiers = glutGetModifiers()
+        modifiers = glut.glutGetModifiers()
         if (key, modifiers) in self.callbacks:
             self.callbacks[(key, modifiers)]()
 
     def start(self):
-        glutKeyboardFunc(self.handle_keyboard_event)
+        glut.glutKeyboardFunc(self.handle_keyboard_event)
