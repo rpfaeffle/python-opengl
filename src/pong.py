@@ -4,6 +4,7 @@ from core.application import Application
 from core.component import Component, Render
 from core.context import WindowContext
 from components.div import Div
+from components.text import Alignment, Text
 from enum import Enum
 
 
@@ -24,6 +25,7 @@ class Pong(Render):
         self.player = Player(cx, True)
         self.computer = Player(cx, False)
         self.ball = Ball(cx)
+        self.game_over_text = Text("Game Over").set_alignment(Alignment.Center)
         self.borders = [
             Div().set_width(cx.width).set_height(BORDER_WIDTH),
             Div().set_width(cx.width).set_height(BORDER_WIDTH).set_y(cx.height - BORDER_WIDTH)
@@ -59,7 +61,7 @@ class Pong(Render):
 
     def render(self, cx):
         self.update()
-        return [self.player, self.computer, self.ball] + self.borders
+        return [self.player, self.computer, self.ball, self.game_over_text] + self.borders
 
 
 class Ball(Component):
