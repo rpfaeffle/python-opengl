@@ -4,6 +4,9 @@ from core.context import WindowContext
 import OpenGL.GL as gl
 import math
 
+def rgb(r: int, g: int, b: int):
+  return (r / 255, g / 255, b / 255)
+
 
 class CircleWindow(Render):
     @staticmethod
@@ -11,7 +14,11 @@ class CircleWindow(Render):
         return CircleWindow()
 
     def render(self, cx: WindowContext):
-        return Circle().set_radius(0.1).set_v_count(2048)
+        return [
+          Circle().set_radius(0.25).set_v_count(2048).set_color(rgb(253, 184, 19)),
+          Circle().set_radius(0.03).set_v_count(2048).set_rotation(0.5, .5).set_color(rgb(0, 0, 255))
+        ]
+
 
 
 class CircleContext(object):
@@ -20,6 +27,9 @@ class CircleContext(object):
 
         self.radius = 0.5
         self.v_count = 128
+        self.rotation_speed = 0.0
+        self.rotation_radius = 0.0
+        self.color = (1.0, 1.0, 1.0)
 
     def set_v_count(self, v_count: int):
         self.v_count = v_count
@@ -27,6 +37,15 @@ class CircleContext(object):
 
     def set_radius(self, radius: float):
         self.radius = radius
+        return self
+
+    def set_rotation(self, speed: float, radius: float):
+        self.rotation_speed = speed
+        self.rotation_radius = radius
+        return self
+
+    def set_color(self, color: tuple[float, float, float]):
+        self.color = color
         return self
 
 
@@ -69,7 +88,8 @@ class Circle(Component, CircleContext):
             self.vertices = Circle.build_circle(self.radius, self.v_count)
 
         gl.glPushMatrix()
-        gl.glColor4f(math.sin(cx.elapsed_time), math.cos(cx.elapsed_time), 1.0, 1.0)
+        gl.glTranslatef(math.sin(cx.elapsed_time * self.rotation_speed) * self.rotation_radius, math.cos(cx.elapsed_time * self.rotation_speed) * self.rotation_radius, 1.0)
+        gl.glColor4f(*self.color, 1.0)
         gl.glBegin(gl.GL_TRIANGLES)
         for vertex in self.vertices:
             gl.glVertex2f(*vertex)
