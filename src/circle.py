@@ -9,15 +9,22 @@ def rgb(r: int, g: int, b: int):
 
 
 class CircleWindow(Render):
+    def __init__(self):
+        self.planets = [
+          Circle().set_radius(0.25).set_v_count(2048).set_color(rgb(253, 184, 19)), # Sun
+          Circle().set_radius(0.01).set_v_count(2048).set_rotation(2, .3).set_color(rgb(255, 255, 255)), # Mercury
+          Circle().set_radius(0.03).set_v_count(2048).set_rotation(0.5, .5).set_color(rgb(0, 0, 255)), # Earth
+          Circle().set_radius(0.02).set_v_count(2048).set_rotation(0.25, .65).set_color(rgb(255, 0, 0)), # Mars
+          Circle().set_radius(0.03).set_v_count(2048).set_rotation(0.8, .38).set_color(rgb(255, 255, 0)), # Venus
+        ]
+        super().__init__()
+
     @staticmethod
     def new(cx: WindowContext):
         return CircleWindow()
 
     def render(self, cx: WindowContext):
-        return [
-          Circle().set_radius(0.25).set_v_count(2048).set_color(rgb(253, 184, 19)),
-          Circle().set_radius(0.03).set_v_count(2048).set_rotation(0.5, .5).set_color(rgb(0, 0, 255))
-        ]
+        return self.planets
 
 
 
